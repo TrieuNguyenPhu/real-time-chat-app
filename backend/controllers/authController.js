@@ -95,7 +95,34 @@ class AuthController {
         }
     }
 
-    
+    static async me(req, res) {
+        try {
+            const user = await User.findById(req.user.id).select("-password");
+
+            if (!user) {
+                return res.status(400).json({message: "User not found"});
+            }
+
+            res.status(200).json({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    fullName: user.fullName,
+                    email: user.email,
+                    connectCode: user.connectCode,
+                }
+            })
+
+        } catch (error) {
+            console.error("Me error", error);
+            res.status(500).json({message: "Internal server error"});
+        }
+    }
+
+    static async logout(req, res) {
+        res.cookie("jwt", "", {maxAge: 0});
+        res.json({message: "Logged out successfully!"});
+    }
 }
 
 export default AuthController;
