@@ -4,6 +4,7 @@ import { useAuthStore } from "../../../stores/authStore"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
 import { authService } from "../../../services/authService"
 import { toast } from "sonner"
 import { Loader2, Lock, Mail } from "lucide-react"
@@ -35,8 +36,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
             toast.success("Login successfull!")
             return navigate('/');
         },
-        onError: (error) => {
-            const msg = error.response?.data?.message || "Login failed"
+        onError: (error: unknown) => {
+            const msg = axios.isAxiosError(error)
+                ? (error.response?.data?.message ?? "Login failed")
+                : "Login failed";
             toast.error(msg);
         }
     })
